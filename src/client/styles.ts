@@ -200,6 +200,17 @@ ${controlsCss}
 
 /** Keep the search field usable when the desktop panel becomes narrow. */
 export const standaloneCss = `
+.dsm-skills .market-filters{display:flex;align-items:center;gap:16px;margin:20px 0;min-width:0}
+.dsm-skills .market-category-wrap{display:flex;align-items:center;flex:1;min-width:0;gap:4px}
+.dsm-skills .market-categories{display:flex;gap:8px;align-items:center;min-width:0;overflow-x:auto;scrollbar-width:thin;padding:4px 0}
+.dsm-skills .market-categories button{flex:none;white-space:nowrap;padding:8px 12px;border:0;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;cursor:pointer}
+.dsm-skills .market-categories button.active{background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);font-weight:600}
+.dsm-skills .category-scroll{flex:none;width:28px;height:32px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);font-size:22px;cursor:pointer}
+.dsm-skills .market-sort{display:flex;gap:8px;align-items:center;flex:none;font-size:13px;color:var(--dsw-alias-label-secondary)}
+.dsm-skills .skillhub-stats{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;color:var(--dsw-alias-label-tertiary);font-size:12px;line-height:20px}
+.dsm-skills .market-categories button:focus-visible,.dsm-skills .category-scroll:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+@media(max-width:640px){.dsm-skills .market-filters{flex-wrap:wrap;gap:12px}.dsm-skills .market-category-wrap{flex-basis:100%}.dsm-skills .market-sort{margin-left:auto}.dsm-skills .market-categories button{min-height:44px}.dsm-skills .market-sort select{min-height:44px}}
+
 .dsm-skills .readonly-badge,.skill-detail-dialog .readonly-badge{display:inline-flex;align-items:center;flex:none;white-space:nowrap;padding:4px 8px;min-height:28px;border:1px solid var(--dsw-alias-border-l2);border-radius:7px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary,var(--dsw-alias-label-primary));font-family:inherit;font-size:12px;line-height:18px}
 .dsm-skills button.readonly-badge{cursor:pointer}
 .dsm-skills button.readonly-badge:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}

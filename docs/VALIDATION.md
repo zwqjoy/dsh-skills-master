@@ -19,3 +19,7 @@ Confirmed market-install title/body padding, right-aligned fixed action area, lo
 ## 0.1.2 readonly skills
 
 Readonly cards and details show an explicit builtin/readonly badge instead of a disabled switch. Clicking the badge opens the actual instructions returned by the official skill registry. Browser verification checks the builtin creator body, absence of switches/edit controls, and the continued availability of the local skill toggle. The Host regression also checks that readonly content is exposed while mutations remain rejected. All 18 tests and browser/package checks passed. Desktop App update verification remains pending.
+
+## 0.2.0 SkillHub categories, sort and statistics
+
+19 tests passed. Added Host coverage for all four remote sort keys, category/query/pagination composition, Chinese labels, valid zero counts, missing values and invalid-filter rejection. Browser checks cover category selection, each sort option, pagination reset, counts, and narrow layout using the production bundle. Live public API checks passed for office-efficiency with score, downloads, updated_at and stars; real install/uninstall/restore probe also passed. App-side update/restart verification remains pending.

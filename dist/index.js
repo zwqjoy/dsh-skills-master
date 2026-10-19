@@ -9462,6 +9462,24 @@ function registerSkillManagementConnection(ctx) {
   }));
 }
 
+// src/market-options.ts
+var marketCategories = [
+  ["office-efficiency", "\u529E\u516C\u6548\u7387"],
+  ["content-creation", "\u5185\u5BB9\u521B\u4F5C"],
+  ["dev-programming", "\u5F00\u53D1\u7F16\u7A0B"],
+  ["data-analysis", "\u6570\u636E\u5206\u6790"],
+  ["design-media", "\u8BBE\u8BA1\u591A\u5A92\u4F53"],
+  ["ai-agent", "AI Agent"],
+  ["knowledge-management", "\u77E5\u8BC6\u7BA1\u7406"],
+  ["business-ops", "\u5546\u4E1A\u8FD0\u8425"],
+  ["education", "\u6559\u80B2\u5B66\u4E60"],
+  ["professional", "\u884C\u4E1A\u4E13\u4E1A"],
+  ["it-ops-security", "IT \u8FD0\u7EF4\u4E0E\u5B89\u5168"],
+  ["life-service", "\u751F\u6D3B\u670D\u52A1"]
+];
+var marketSorts = [["score", "\u7EFC\u5408\u8BC4\u5206"], ["downloads", "\u4E0B\u8F7D\u91CF"], ["updated_at", "\u6700\u8FD1\u66F4\u65B0"], ["stars", "\u6536\u85CF\u91CF"]];
+var categoryLabel = (key) => marketCategories.find(([id]) => id === key)?.[1] ?? key;
+
 // src/services/market.ts
 var marketPath = "/api/dsh-skills-master/market";
 var api = "https://api.skillhub.cn";
@@ -9469,11 +9487,19 @@ function marketSlug(value) {
   if (typeof value !== "string" || !/^[a-z0-9][a-z0-9_-]{0,127}$/i.test(value)) throw new Error("\u6280\u80FD\u6807\u8BC6\u65E0\u6548\u3002");
   return value;
 }
+function metric(value) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? Math.floor(value) : void 0;
+}
 async function searchMarket(manager, body, signal, fetcher = fetch) {
   const query = typeof body.query === "string" ? body.query.trim().slice(0, 200) : "";
   const offset = typeof body.offset === "number" && Number.isSafeInteger(body.offset) && body.offset >= 0 ? body.offset : 0;
-  const params = new URLSearchParams({ sortBy: query ? "score" : "downloads", order: "desc", page: String(Math.floor(offset / 24) + 1), pageSize: "24" });
+  const category = typeof body.category === "string" ? body.category : "";
+  if (category && !marketCategories.some(([key]) => key === category)) throw new Error("\u65E0\u6548\u6280\u80FD\u5206\u7C7B\u3002");
+  const sortBy = body.sortBy === void 0 ? "score" : body.sortBy;
+  if (!marketSorts.some(([key]) => key === sortBy)) throw new Error("\u65E0\u6548\u6392\u5E8F\u65B9\u5F0F\u3002");
+  const params = new URLSearchParams({ sortBy, order: "desc", page: String(Math.floor(offset / 24) + 1), pageSize: "24" });
   if (query) params.set("keyword", query);
+  if (category) params.set("category", category);
   const response = await fetcher(`${api}/api/skills?${params}`, { signal: AbortSignal.any([signal, AbortSignal.timeout(25e3)]) });
   if (!response.ok) throw new Error(`SkillHub \u76EE\u5F55\u8BF7\u6C42\u5931\u8D25 (${response.status})`);
   const result = await response.json();
@@ -9483,9 +9509,13 @@ async function searchMarket(manager, body, signal, fetcher = fetch) {
     slug: row.slug,
     name: String(row.name || row.slug),
     description: String(row.description_zh || row.description || ""),
-    categoryLabel: String(row.category || ""),
+    category: String(row.category || ""),
+    categoryLabel: categoryLabel(String(row.category || "")),
     version: String(row.version || ""),
     owner: String(row.ownerName || ""),
+    downloads: metric(row.downloads),
+    stars: metric(row.stars),
+    updatedAt: typeof row.updated_at === "number" && Number.isFinite(row.updated_at) && row.updated_at > 0 && row.updated_at < 864e13 ? row.updated_at : void 0,
     iconUrl: typeof row.iconUrl === "string" && row.iconUrl.startsWith("https://") ? row.iconUrl : void 0,
     pageUrl: `https://skillhub.cn/skills/${encodeURIComponent(row.slug)}`,
     installed: installed.has(row.slug)

@@ -51,3 +51,22 @@ test('search encodes queries, pages by 24 and exposes real provider errors', asy
     await assert.rejects(searchMarket(f.manager,{},new AbortController().signal,(async()=>new Response('',{status:503})) as typeof fetch), /503/);
   } finally { await f.close(); }
 });
+
+test('category and sort operate on the remote catalog, preserving metrics and missing values', async () => {
+  const f = await fixture();
+  try {
+    for (const sortBy of ['score', 'downloads', 'updated_at', 'stars']) {
+      const response = await searchMarket(f.manager, {category:'office-efficiency',sortBy,offset:48,query:'中文'}, new AbortController().signal, (async(url)=>{
+        const u = new URL(String(url));
+        assert.equal(u.searchParams.get('category'),'office-efficiency');assert.equal(u.searchParams.get('sortBy'),sortBy);
+        assert.equal(u.searchParams.get('page'),'3');assert.equal(u.searchParams.get('keyword'),'中文');
+        return Response.json({code:0,data:{skills:[{slug:'stats',category:'office-efficiency',downloads:123456,stars:0,updated_at:1792424515147},{slug:'missing'}],total:200}});
+      }) as typeof fetch);
+      assert.equal(response.total,200);assert.equal(response.items[0].categoryLabel,'办公效率');
+      assert.equal(response.items[0].downloads,123456);assert.equal(response.items[0].stars,0);assert.equal(response.items[0].updatedAt,1792424515147);
+      assert.equal(response.items[1].downloads,undefined);assert.equal(response.items[1].updatedAt,undefined);
+    }
+    await assert.rejects(searchMarket(f.manager,{category:'made-up'},new AbortController().signal),/无效技能分类/);
+    await assert.rejects(searchMarket(f.manager,{sortBy:'made-up'},new AbortController().signal),/无效排序方式/);
+  } finally { await f.close(); }
+});

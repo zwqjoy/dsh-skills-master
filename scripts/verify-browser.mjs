@@ -24,7 +24,7 @@ globalThis.fetch = async (url, options) => {
   if (marketFailure) return new Response('',{status:503});
   if (String(url).includes('/download?')) return new Response(bytes);
   const u = new URL(String(url)); const keyword=u.searchParams.get('keyword');
-  const items=keyword==='没有这个技能'?[]:Array.from({length:24},(_,i)=>({slug:i===0?'market-sample':`sample-${i}`,name:i===0?'市场测试技能':`技能示例 ${i}`,description:'清晰的技能说明，可查看来源后确认安装。',version:'1.0.0',category:'productivity'}));
+  const items=keyword==='没有这个技能'?[]:Array.from({length:24},(_,i)=>({slug:i===0?'market-sample':`sample-${i}`,name:i===0?'市场测试技能':`技能示例 ${i}`,description:'清晰的技能说明，可查看来源后确认安装。',version:'1.0.0',category:u.searchParams.get('category')||'dev-programming',downloads:1234567,stars:42,updated_at:1792424515147}));
   return Response.json({code:0,data:{skills:items,total:items.length?48:0}});
 };
 try {
@@ -69,7 +69,22 @@ try {
   await page.getByRole('switch',{name:'停用技能 local-sample',exact:true}).waitFor();
   await page.getByRole('button',{name:'SkillHub',exact:true}).click();
   await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).waitFor();
+  const categoryNav=page.getByRole('navigation',{name:'SkillHub 分类',exact:true});
+  const waitSearch=(category,sortBy,offset=0)=>page.waitForResponse(response=>{
+    if(!response.url().endsWith('/api/dsh-skills-master/market'))return false;
+    const payload=response.request().postDataJSON();return payload.method==='search'&&payload.category===category&&payload.sortBy===sortBy&&payload.offset===offset;
+  });
+  await Promise.all([waitSearch('office-efficiency','score'),categoryNav.getByRole('button',{name:'办公效率',exact:true}).click()]);
+  await Promise.all([waitSearch('office-efficiency','downloads'),page.getByRole('combobox',{name:'SkillHub 排序'}).selectOption('downloads')]);
+  await page.locator('.skillhub-stats').first().getByText('下载 123.46万',{exact:true}).waitFor();
+  await page.locator('.skillhub-stats').first().getByText('收藏 42',{exact:true}).waitFor();
   await page.screenshot({path:'test-results/market-desktop.png',fullPage:true});
+  await page.getByRole('button',{name:'下一页',exact:true}).click();await page.getByText('第 2 / 2 页').waitFor();
+  await Promise.all([waitSearch('office-efficiency','updated_at'),page.getByRole('combobox',{name:'SkillHub 排序'}).selectOption('updated_at')]);
+  await page.getByText('第 1 / 2 页').waitFor();
+  await Promise.all([waitSearch('office-efficiency','stars'),page.getByRole('combobox',{name:'SkillHub 排序'}).selectOption('stars')]);
+  await Promise.all([waitSearch('','stars'),categoryNav.getByRole('button',{name:'全部',exact:true}).click()]);
+
   await page.getByRole('button',{name:'下一页',exact:true}).click();await page.getByText('第 2 / 2 页').waitFor();
   await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).click();
   await page.getByRole('dialog',{name:'确认安装 SkillHub 技能'}).waitFor();

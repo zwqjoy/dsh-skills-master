@@ -1,3 +1,4 @@
+import { marketCategories, marketSorts, categoryLabel } from '../market-options.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type { HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
 import type { SkillManagementService } from '../shared.js';
@@ -8,11 +9,17 @@ export function marketSlug(value: unknown): string {
   if (typeof value !== 'string' || !/^[a-z0-9][a-z0-9_-]{0,127}$/i.test(value)) throw new Error('技能标识无效。');
   return value;
 }
+function metric(value: unknown): number | undefined { return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? Math.floor(value) : undefined; }
 export async function searchMarket(manager: SkillManagementService, body: Record<string, unknown>, signal: AbortSignal, fetcher: typeof fetch = fetch) {
   const query = typeof body.query === 'string' ? body.query.trim().slice(0, 200) : '';
   const offset = typeof body.offset === 'number' && Number.isSafeInteger(body.offset) && body.offset >= 0 ? body.offset : 0;
-  const params = new URLSearchParams({ sortBy: query ? 'score' : 'downloads', order: 'desc', page: String(Math.floor(offset / 24) + 1), pageSize: '24' });
+  const category = typeof body.category === 'string' ? body.category : '';
+  if (category && !marketCategories.some(([key]) => key === category)) throw new Error('无效技能分类。');
+  const sortBy = body.sortBy === undefined ? 'score' : body.sortBy;
+  if (!marketSorts.some(([key]) => key === sortBy)) throw new Error('无效排序方式。');
+  const params = new URLSearchParams({ sortBy: sortBy as string, order: 'desc', page: String(Math.floor(offset / 24) + 1), pageSize: '24' });
   if (query) params.set('keyword', query);
+  if (category) params.set('category', category);
   const response = await fetcher(`${api}/api/skills?${params}`, { signal: AbortSignal.any([signal, AbortSignal.timeout(25_000)]) });
   if (!response.ok) throw new Error(`SkillHub 目录请求失败 (${response.status})`);
   const result = await response.json() as { code?: number; data?: { skills?: Record<string, any>[]; total?: number } };
@@ -20,7 +27,9 @@ export async function searchMarket(manager: SkillManagementService, body: Record
   const installed = new Set((await manager.list(signal)).filter(row => row.state !== 'disabled').map(row => row.name));
   const items = result.data.skills.filter(row => typeof row.slug === 'string' && /^[a-z0-9][a-z0-9_-]{0,127}$/i.test(row.slug)).map(row => ({
     slug: row.slug as string, name: String(row.name || row.slug), description: String(row.description_zh || row.description || ''),
-    categoryLabel: String(row.category || ''), version: String(row.version || ''), owner: String(row.ownerName || ''),
+    category: String(row.category || ''), categoryLabel: categoryLabel(String(row.category || '')), version: String(row.version || ''), owner: String(row.ownerName || ''),
+    downloads: metric(row.downloads), stars: metric(row.stars),
+    updatedAt: typeof row.updated_at === 'number' && Number.isFinite(row.updated_at) && row.updated_at > 0 && row.updated_at < 8.64e15 ? row.updated_at : undefined,
     iconUrl: typeof row.iconUrl === 'string' && row.iconUrl.startsWith('https://') ? row.iconUrl : undefined,
     pageUrl: `https://skillhub.cn/skills/${encodeURIComponent(row.slug)}`, installed: installed.has(row.slug),
   }));

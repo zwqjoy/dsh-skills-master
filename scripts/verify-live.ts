@@ -12,6 +12,12 @@ try {
   await ctx.plugin(Registry);
   const manager=new SkillManager(ctx,{dshHome:join(root,'dsh'),agentsHome:join(root,'agents')});
   const signal=AbortSignal.timeout(120_000);
+  for (const sortBy of ['score','downloads','updated_at','stars']) {
+    const filtered = await searchMarket(manager,{category:'office-efficiency',sortBy},signal);
+    assert.ok(filtered.items.length, `live ${sortBy} results`);
+    assert.ok(filtered.items.every(row => row.category === 'office-efficiency'), 'remote category filter');
+  }
+  console.log('PASS: live office-efficiency category with score/downloads/updated_at/stars sorts');
   const search=await searchMarket(manager,{query:'find-skills'},signal);
   assert.ok(search.items.length,'real SkillHub search results');
   const card=search.items.find(row=>row.slug==='find-skills')??search.items[0];
