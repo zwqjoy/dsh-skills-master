@@ -9479,6 +9479,7 @@ var marketCategories = [
 ];
 var marketSorts = [["score", "\u7EFC\u5408\u8BC4\u5206"], ["downloads", "\u4E0B\u8F7D\u91CF"], ["updated_at", "\u6700\u8FD1\u66F4\u65B0"], ["stars", "\u6536\u85CF\u91CF"]];
 var categoryLabel = (key) => marketCategories.find(([id]) => id === key)?.[1] ?? key;
+var marketContractVersion = 2;
 
 // src/services/market.ts
 var marketPath = "/api/dsh-skills-master/market";
@@ -9520,7 +9521,7 @@ async function searchMarket(manager, body, signal, fetcher = fetch) {
     pageUrl: `https://skillhub.cn/skills/${encodeURIComponent(row.slug)}`,
     installed: installed.has(row.slug)
   }));
-  return { ok: true, items, total: Number(result.data.total) || items.length };
+  return { ok: true, contractVersion: marketContractVersion, category, sortBy, items, total: Number(result.data.total) || items.length };
 }
 async function prepareMarketInstall(manager, body, signal, fetcher = fetch) {
   const slug = marketSlug(body.slug);

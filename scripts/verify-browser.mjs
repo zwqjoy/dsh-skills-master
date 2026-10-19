@@ -18,7 +18,7 @@ const original = {DSH_HOME:process.env.DSH_HOME, DSH_AGENTS_HOME:process.env.DSH
 const ctx = new Context(); const routes = new Map(); let browser, server;
 const nativeFetch = globalThis.fetch;
 const bytes = zipSync({'SKILL.md':new TextEncoder().encode('---\nname: market-sample\ndescription: 从市场安装的测试技能\n---\nMarket fixture body\n')});
-let marketFailure = false;
+let marketFailure = false; let legacyMarket = false;
 globalThis.fetch = async (url, options) => {
   if (!String(url).startsWith('https://api.skillhub.cn/')) return nativeFetch(url,options);
   if (marketFailure) return new Response('',{status:503});
@@ -45,6 +45,7 @@ try {
       if(route){
         const chunks=[];for await(const chunk of req)chunks.push(chunk);
         const response=await route.fetch(new Request(`http://localhost${req.url}`,{method:req.method,headers:req.headers,...(req.method!=='GET'?{body:Buffer.concat(chunks)}:{})}));
+        if (legacyMarket && path==='/api/dsh-skills-master/market') { res.setHeader('Content-Type','application/json'); res.end(JSON.stringify({ok:true,total:199580,items:[{slug:'old',name:'旧版全站结果'}]})); return; }
         res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));return;
       }
       res.setHeader('Content-Type','text/html');res.end(`<!doctype html><html lang="zh"><meta charset="utf-8"><link rel="stylesheet" href="/entry.css"><style>:root{--dsw-alias-bg-base:#faf9f6;--dsw-alias-bg-layer-1:#fff;--dsw-alias-bg-layer-2:#f6f5f2;--dsw-alias-bg-layer-3:#eeeae5;--dsw-alias-label-primary:#272522;--dsw-alias-label-secondary:#666;--dsw-alias-label-tertiary:#77736c;--dsw-alias-border-l2:#dedbd5;--dsw-alias-brand-primary:#d97858;--dsw-alias-brand-text:#b65738;--dsw-alias-state-success-primary:#26a269;--dsw-alias-state-error-primary:#b42318;--dsw-alias-button-primary-fill:#d97858;--dsw-alias-label-primary-inverted:#fff;--dsw-alias-bg-mask-2:#0007;--dsw-elevation-prominent:0 12px 60px #0003}*{box-sizing:border-box}body{margin:0}#root{height:100vh}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.5}</style><div id="root"></div><script src="/entry.js"></script><script src="/client.js"></script></html>`);
@@ -68,6 +69,13 @@ try {
   await readonlyDialog.getByRole('button',{name:'关闭',exact:true}).click();
   await page.getByRole('switch',{name:'停用技能 local-sample',exact:true}).waitFor();
   await page.getByRole('button',{name:'SkillHub',exact:true}).click();
+  await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).waitFor();
+  legacyMarket=true;
+  await page.getByRole('button',{name:'刷新',exact:true}).click();
+  await page.getByRole('alert').filter({hasText:'后台服务仍是旧版本'}).waitFor();
+  assert.equal(await page.getByRole('link',{name:'查看 旧版全站结果 的来源页',exact:true}).count(),0);
+  legacyMarket=false;
+  await page.getByRole('button',{name:'刷新',exact:true}).click();
   await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).waitFor();
   const categoryNav=page.getByRole('navigation',{name:'SkillHub 分类',exact:true});
   const waitSearch=(category,sortBy,offset=0)=>page.waitForResponse(response=>{

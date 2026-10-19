@@ -35,7 +35,7 @@
 ### 独立 Web Profile
 
 ```sh
-dsh plugin --profile <你的WebProfile> add /absolute/path/dsh-skills-master-0.2.0.tgz
+dsh plugin --profile <你的WebProfile> add /absolute/path/dsh-skills-master-0.2.1.tgz
 ```
 
 也可以在支持 GitHub 来源安装的插件管理器填写：
@@ -45,6 +45,10 @@ github:zwqjoy/dsh-skills-master
 ```
 
 GitHub 安装路径尚未在用户的 Desktop App 内验收；本地目录及 tgz 是本轮提供的安装产物。
+
+## 更新后分类或排序没变化
+
+如果能看到新控件，但分类仍返回全站数据、统计全部为空，可能是 Client 已刷新而 Host 仍保留旧模块。请先完成当前运行任务，然后 **完全退出 Harness App，再重新打开**；仅刷新页面不会重启 Host。v0.2.1 会校验市场接口版本及筛选参数，不再把旧响应误显示为成功结果。
 
 ## 数据位置
 

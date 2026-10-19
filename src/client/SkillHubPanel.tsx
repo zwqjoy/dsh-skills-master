@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
-import { marketCategories, marketSorts } from '../market-options.js';
+import { marketCategories, marketSorts, marketContractVersion } from '../market-options.js';
 import { Button, Modal, Select } from '../ui/index.js';
 import type { StagedSkillImport } from '../shared.js';
 import type { SkillManagementClient } from './management.js';
@@ -20,7 +20,7 @@ type SkillHubCard = {
   installed?: boolean;
 };
 
-type SearchResponse = { ok: boolean; items?: SkillHubCard[]; total?: number; error?: string };
+type SearchResponse = { ok: boolean; contractVersion?: number; category?: string; sortBy?: string; items?: SkillHubCard[]; total?: number; error?: string };
 const PAGE_SIZE = 24;
 function count(value?: number) { return value === undefined ? '—' : value >= 10000 ? `${Number((value / 10000).toFixed(2))}万` : value.toLocaleString('zh-CN'); }
 function updated(value?: number) { return value ? new Date(value).toLocaleDateString('zh-CN') : '未提供'; }
@@ -62,8 +62,8 @@ export function SkillHubPanel({ query, onInstalled, onOpenInstalled, management,
     const timer = window.setTimeout(() => {
       setBusy(true); setError('');
       void skillHub<SearchResponse>('search', { query: query.trim(), category, sortBy, limit: PAGE_SIZE, offset: page * PAGE_SIZE }, controller.signal)
-        .then(result => { setCards([...new Map((result.items ?? []).map(item => [item.slug, item])).values()]); setTotal(result.total ?? 0); })
-        .catch(cause => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : 'SkillHub 暂不可用'); })
+        .then(result => { if (result.contractVersion !== marketContractVersion || result.category !== category || result.sortBy !== sortBy) throw new Error('技能市场页面已更新，但后台服务仍是旧版本。请在当前任务完成后，完全退出并重新打开 Harness App；仅刷新页面不能更新后台。'); setCards([...new Map((result.items ?? []).map(item => [item.slug, item])).values()]); setTotal(result.total ?? 0); })
+        .catch(cause => { if (!controller.signal.aborted) { setCards([]); setTotal(0); setError(cause instanceof Error ? cause.message : 'SkillHub 暂不可用'); } })
         .finally(() => { if (!controller.signal.aborted) setBusy(false); });
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };

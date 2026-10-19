@@ -62,7 +62,7 @@ test('category and sort operate on the remote catalog, preserving metrics and mi
         assert.equal(u.searchParams.get('page'),'3');assert.equal(u.searchParams.get('keyword'),'中文');
         return Response.json({code:0,data:{skills:[{slug:'stats',category:'office-efficiency',downloads:123456,stars:0,updated_at:1792424515147},{slug:'missing'}],total:200}});
       }) as typeof fetch);
-      assert.equal(response.total,200);assert.equal(response.items[0].categoryLabel,'办公效率');
+      assert.equal(response.contractVersion,2);assert.equal(response.category,'office-efficiency');assert.equal(response.sortBy,sortBy);assert.equal(response.total,200);assert.equal(response.items[0].categoryLabel,'办公效率');
       assert.equal(response.items[0].downloads,123456);assert.equal(response.items[0].stars,0);assert.equal(response.items[0].updatedAt,1792424515147);
       assert.equal(response.items[1].downloads,undefined);assert.equal(response.items[1].updatedAt,undefined);
     }

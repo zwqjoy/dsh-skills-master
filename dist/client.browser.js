@@ -1095,6 +1095,7 @@ var marketCategories = [
   ["life-service", "\u751F\u6D3B\u670D\u52A1"]
 ];
 var marketSorts = [["score", "\u7EFC\u5408\u8BC4\u5206"], ["downloads", "\u4E0B\u8F7D\u91CF"], ["updated_at", "\u6700\u8FD1\u66F4\u65B0"], ["stars", "\u6536\u85CF\u91CF"]];
+var marketContractVersion = 2;
 
 // src/client/SkillHubPanel.tsx
 var PAGE_SIZE = 24;
@@ -1143,10 +1144,15 @@ function SkillHubPanel({ query, onInstalled, onOpenInstalled, management, refres
       setBusy(true);
       setError("");
       void skillHub("search", { query: query.trim(), category, sortBy, limit: PAGE_SIZE, offset: page * PAGE_SIZE }, controller.signal).then((result) => {
+        if (result.contractVersion !== marketContractVersion || result.category !== category || result.sortBy !== sortBy) throw new Error("\u6280\u80FD\u5E02\u573A\u9875\u9762\u5DF2\u66F4\u65B0\uFF0C\u4F46\u540E\u53F0\u670D\u52A1\u4ECD\u662F\u65E7\u7248\u672C\u3002\u8BF7\u5728\u5F53\u524D\u4EFB\u52A1\u5B8C\u6210\u540E\uFF0C\u5B8C\u5168\u9000\u51FA\u5E76\u91CD\u65B0\u6253\u5F00 Harness App\uFF1B\u4EC5\u5237\u65B0\u9875\u9762\u4E0D\u80FD\u66F4\u65B0\u540E\u53F0\u3002");
         setCards([...new Map((result.items ?? []).map((item) => [item.slug, item])).values()]);
         setTotal(result.total ?? 0);
       }).catch((cause) => {
-        if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "SkillHub \u6682\u4E0D\u53EF\u7528");
+        if (!controller.signal.aborted) {
+          setCards([]);
+          setTotal(0);
+          setError(cause instanceof Error ? cause.message : "SkillHub \u6682\u4E0D\u53EF\u7528");
+        }
       }).finally(() => {
         if (!controller.signal.aborted) setBusy(false);
       });

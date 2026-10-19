@@ -9,3 +9,6 @@ export const marketCategories = [
 ] as const;
 export const marketSorts = [['score', '综合评分'], ['downloads', '下载量'], ['updated_at', '最近更新'], ['stars', '收藏量']] as const;
 export const categoryLabel = (key: string) => marketCategories.find(([id]) => id === key)?.[1] ?? key;
+
+/** Prevent an updated Client from silently consuming the old Host response. */
+export const marketContractVersion = 2;

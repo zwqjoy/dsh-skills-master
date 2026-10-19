@@ -1,4 +1,4 @@
-import { marketCategories, marketSorts, categoryLabel } from '../market-options.js';
+import { marketCategories, marketSorts, categoryLabel, marketContractVersion } from '../market-options.js';
 import type { Context } from '@deepseek-ai/cordis';
 import type { HostConnectionHandle } from '@deepseek-ai/dsh-client-connection';
 import type { SkillManagementService } from '../shared.js';
@@ -33,7 +33,7 @@ export async function searchMarket(manager: SkillManagementService, body: Record
     iconUrl: typeof row.iconUrl === 'string' && row.iconUrl.startsWith('https://') ? row.iconUrl : undefined,
     pageUrl: `https://skillhub.cn/skills/${encodeURIComponent(row.slug)}`, installed: installed.has(row.slug),
   }));
-  return { ok: true, items, total: Number(result.data.total) || items.length };
+  return { ok: true, contractVersion: marketContractVersion, category, sortBy, items, total: Number(result.data.total) || items.length };
 }
 export async function prepareMarketInstall(manager: SkillManagementService, body: Record<string, unknown>, signal: AbortSignal, fetcher: typeof fetch = fetch) {
   const slug = marketSlug(body.slug);

@@ -23,3 +23,7 @@ Readonly cards and details show an explicit builtin/readonly badge instead of a 
 ## 0.2.0 SkillHub categories, sort and statistics
 
 19 tests passed. Added Host coverage for all four remote sort keys, category/query/pagination composition, Chinese labels, valid zero counts, missing values and invalid-filter rejection. Browser checks cover category selection, each sort option, pagination reset, counts, and narrow layout using the production bundle. Live public API checks passed for office-efficiency with score, downloads, updated_at and stars; real install/uninstall/restore probe also passed. App-side update/restart verification remains pending.
+
+## 0.2.1 mixed Client/Host detection
+
+The user supplied a Desktop screenshot with new filters but old-format results (raw category keys, whole-catalog total, absent counts). Installed files were confirmed at 0.2.0. This is consistent with a running Host retaining the old module after the Client reloads; no live authenticated Host payload was captured. Search responses now include a contract version and applied category/sort; the Client rejects mismatches and clears misleading rows. Browser regression explicitly simulates the old Host response and verifies the restart guidance, then restores the new response and repeats normal filtering/install checks. All 19 tests, package/browser checks and live API probes passed. Desktop was not restarted because active tasks were observed; actual post-restart acceptance remains pending.
