@@ -63,6 +63,21 @@ try {
   await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).click();
   await page.getByRole('dialog',{name:'确认安装 SkillHub 技能'}).waitFor();
   assert.equal((await ctx.dshSkillsMaster.list()).some(row=>row.name==='market-sample'),false);
+  const dialog=page.getByRole('dialog',{name:'确认安装 SkillHub 技能'});
+  const checkDialog=async()=>{
+    await dialog.evaluate(async el=>{await Promise.all(el.getAnimations().map(animation=>animation.finished));});
+    const bounds=await dialog.boundingBox();const title=await dialog.locator('h2').boundingBox();const confirm=await dialog.getByRole('button',{name:'确认安装',exact:true}).boundingBox();
+    assert.ok(await dialog.locator('h2').evaluate(el=>parseFloat(getComputedStyle(el).paddingLeft)>=20),'title has horizontal padding');
+    assert.ok(confirm.y+confirm.height<=bounds.y+bounds.height,'actions stay inside dialog');
+    assert.ok(await dialog.evaluate(el=>el.scrollWidth<=el.clientWidth),'dialog has no horizontal overflow');
+  };
+  await checkDialog();await page.screenshot({path:'test-results/install-dialog-desktop.png'});
+  await page.setViewportSize({width:390,height:640});
+  await dialog.locator('.market-install-description').evaluate(el=>el.textContent='长描述：优化技能、检查质量、处理资源和说明文档。'.repeat(80));
+  await dialog.getByText('文件清单',{exact:true}).click();await checkDialog();
+  await dialog.locator('.market-install-body').evaluate(el=>{el.scrollTop=0;});
+  await page.screenshot({path:'test-results/install-dialog-mobile.png'});
+  await page.setViewportSize({width:1280,height:850});
   await page.getByRole('button',{name:'取消',exact:true}).click();
   await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).click();
   await page.getByRole('button',{name:'确认安装',exact:true}).click();

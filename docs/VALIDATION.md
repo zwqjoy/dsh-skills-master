@@ -11,3 +11,7 @@ Baseline: Node 22.23.1; official Harness services 0.2.1-rc.2; Cordis 4.0.5.
 - User's installed Harness Desktop: installation, restart, real sidebar loading, and persistence across App restarts remain unverified. Browser/Host checks do not substitute for this layer.
 
 Reproduce with the commands in README. CI runs deterministic checks; live network verification is a separate explicit command.
+
+## 0.1.1 dialog layout fix
+
+Confirmed market-install title/body padding, right-aligned fixed action area, long-description scrolling and file-list expansion at 390 x 640. Production Client/browser regression and archive activation checks pass. User Desktop screenshot supplied the defect evidence; post-update Desktop verification remains pending.

@@ -102,14 +102,14 @@ export function SkillHubPanel({ query, onInstalled, onOpenInstalled, management,
         <p className="muted">{card.description}</p>
         <small className="skillhub-meta">版本 {card.version || '未标注'} · 许可证请查看来源页</small>
       </article>)}</div> : !error && <p className="muted">没有找到匹配的技能。</p>}
-    <Modal open={Boolean(review)} label="确认安装 SkillHub 技能" onClose={() => void cancelReview()}>
-      {review && <><h2>安装 {review.card.name}</h2><p>{review.staged.inspection.description}</p>
+    <Modal className="market-install-dialog" open={Boolean(review)} label="确认安装 SkillHub 技能" onClose={() => void cancelReview()}>
+      {review && <><h2 className="market-install-title">安装 {review.card.name}</h2><div className="market-install-body"><p className="market-install-description">{review.staged.inspection.description}</p>
         <p>版本：{review.card.version || '来源未标注'} · 安装到当前 Harness 技能目录</p>
         <p>技能名称：{review.staged.inspection.name} · {review.staged.inspection.files.length} 个文件 · {Math.ceil(review.staged.inspection.totalBytes / 1024)} KiB</p>
         <a href={review.card.pageUrl} target="_blank" rel="noopener noreferrer">查看来源与许可证</a>
         <details><summary>文件清单</summary><ul>{review.staged.inspection.files.map(path => <li key={path}>{path}</li>)}</ul></details>
-        {error && <p role="alert">{error}</p>}
-        <div className="detail-actions"><Button disabled={Boolean(installing)} onClick={() => void cancelReview()}>取消</Button><Button variant="primary" disabled={Boolean(installing)} onClick={() => void confirmInstall()}>{installing ? '安装中…' : '确认安装'}</Button></div>
+        {error && <p role="alert">{error}</p>}</div>
+        <div className="market-install-actions"><Button disabled={Boolean(installing)} onClick={() => void cancelReview()}>取消</Button><Button variant="primary" disabled={Boolean(installing)} onClick={() => void confirmInstall()}>{installing ? '安装中…' : '确认安装'}</Button></div>
       </>}
     </Modal>
     {!busy && pageCount > 1 && <nav className="skillhub-pagination" aria-label="SkillHub 分页"><Button disabled={page === 0} onClick={() => setPage(value => value - 1)}>上一页</Button>{firstPage > 0 && <span aria-hidden="true">…</span>}{pageNumbers.map(number => <button key={number} aria-current={page === number ? 'page' : undefined} className={page === number ? 'active' : ''} onClick={() => setPage(number)}>{number + 1}</button>)}{firstPage + pageNumbers.length < pageCount && <span aria-hidden="true">…</span>}<Button disabled={page + 1 >= pageCount} onClick={() => setPage(value => value + 1)}>下一页</Button><span className="muted">第 {page + 1} / {pageCount} 页</span></nav>}

@@ -31,7 +31,7 @@
 ### 独立 Web Profile
 
 ```sh
-dsh plugin --profile <你的WebProfile> add /absolute/path/dsh-skills-master-0.1.0.tgz
+dsh plugin --profile <你的WebProfile> add /absolute/path/dsh-skills-master-0.1.1.tgz
 ```
 
 也可以在支持 GitHub 来源安装的插件管理器填写：

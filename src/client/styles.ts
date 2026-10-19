@@ -200,6 +200,19 @@ ${controlsCss}
 
 /** Keep the search field usable when the desktop panel becomes narrow. */
 export const standaloneCss = `
+.dsm-dialog.market-install-dialog{display:flex;flex-direction:column;overflow:hidden;width:min(720px,calc(100vw - 48px));padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
+.market-install-dialog .market-install-title{flex:none;margin:0;padding:24px 64px 16px 24px;font-family:inherit;font-size:22px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+.market-install-dialog .market-install-body{min-height:0;overflow:auto;padding:0 24px 24px;overflow-wrap:anywhere;line-height:1.75}
+.market-install-dialog .market-install-body p{margin:0 0 16px}
+.market-install-dialog .market-install-description{color:var(--dsw-alias-label-secondary,var(--dsw-alias-label-primary))}
+.market-install-dialog .market-install-body a{display:inline-block;margin:0 0 16px;color:var(--dsw-alias-brand-text);text-underline-offset:3px}
+.market-install-dialog details{padding:12px 16px;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-layer-2)}
+.market-install-dialog summary{cursor:pointer;font-weight:500}
+.market-install-dialog ul{margin:12px 0 0;padding-left:20px;font:12px/1.8 ui-monospace,SFMono-Regular,monospace}
+.market-install-dialog .market-install-actions{flex:none;display:flex;justify-content:flex-end;gap:12px;padding:16px 24px;border-top:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1)}
+.market-install-dialog .market-install-actions button{min-height:40px;min-width:88px}
+@media(max-width:640px){.dsm-dialog.market-install-dialog{width:calc(100vw - 24px)}.market-install-dialog .market-install-title{padding:20px 60px 16px 20px;font-size:20px}.market-install-dialog .market-install-body{padding:0 20px 20px}.market-install-dialog .market-install-actions{padding:16px 20px}.market-install-dialog .market-install-actions button{min-height:44px}}
+
 @media(max-width:560px){.dsm-skills .cap-header .search{order:2;flex:1 0 100%;width:100%;max-width:none}}
 @media(prefers-reduced-motion:reduce){.dsm-dialog{animation:none}}
 `;
