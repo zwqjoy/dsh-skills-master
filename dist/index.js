@@ -8893,7 +8893,8 @@ var SkillManager = class extends Service {
       modelInvocable: definition.invocation.modelInvocable,
       state: "readonly",
       manageable: false,
-      resources: []
+      resources: [],
+      document: definition.content
     };
     if (!definition.path) return readonlyDetail;
     const active = await this.managedEntryForPath(definition.path);

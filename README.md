@@ -4,6 +4,8 @@
 
 ## 功能
 
+宿主或插件提供的技能显示「内置 · 只读」，点击标识或技能名称可查看说明正文；只读技能不显示启停开关，也不开放编辑和卸载。只读不表示已停用。
+
 - **本地技能**：搜索、查看完整 SKILL.md 和资源、编辑文本、启用/停用、批量管理。
 - **技能市场**：浏览 SkillHub、关键词搜索、分页、查看来源及版本。
 - **确认安装**：下载后先预检并展示文件清单，再由用户确认安装；拒绝同名覆盖。
@@ -31,7 +33,7 @@
 ### 独立 Web Profile
 
 ```sh
-dsh plugin --profile <你的WebProfile> add /absolute/path/dsh-skills-master-0.1.1.tgz
+dsh plugin --profile <你的WebProfile> add /absolute/path/dsh-skills-master-0.1.2.tgz
 ```
 
 也可以在支持 GitHub 来源安装的插件管理器填写：

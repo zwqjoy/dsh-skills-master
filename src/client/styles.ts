@@ -200,6 +200,12 @@ ${controlsCss}
 
 /** Keep the search field usable when the desktop panel becomes narrow. */
 export const standaloneCss = `
+.dsm-skills .readonly-badge,.skill-detail-dialog .readonly-badge{display:inline-flex;align-items:center;flex:none;white-space:nowrap;padding:4px 8px;min-height:28px;border:1px solid var(--dsw-alias-border-l2);border-radius:7px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary,var(--dsw-alias-label-primary));font-family:inherit;font-size:12px;line-height:18px}
+.dsm-skills button.readonly-badge{cursor:pointer}
+.dsm-skills button.readonly-badge:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.skill-detail-dialog .readonly-badge[hidden]{display:none}
+.skill-detail-dialog .readonly-note{padding:12px 16px;border-radius:8px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary);line-height:1.7}
+
 .dsm-dialog.market-install-dialog{display:flex;flex-direction:column;overflow:hidden;width:min(720px,calc(100vw - 48px));padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 .market-install-dialog .market-install-title{flex:none;margin:0;padding:24px 64px 16px 24px;font-family:inherit;font-size:22px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
 .market-install-dialog .market-install-body{min-height:0;overflow:auto;padding:0 24px 24px;overflow-wrap:anywhere;line-height:1.75}

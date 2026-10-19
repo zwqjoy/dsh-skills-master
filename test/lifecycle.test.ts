@@ -47,6 +47,11 @@ test('Skill service waits, activates independently, disposes consumers and resto
     assert.equal(ctx.dshSkillsMaster.contractVersion, 1);
     const creator = await ctx.skills.get('dsh-skills-master-skill-creator');
     assert.ok(creator, 'skill creator registered through official Skills');
+    const builtinDetail = await ctx.dshSkillsMaster.detail('dsh-skills-master-skill-creator');
+    assert.equal(builtinDetail.state, 'readonly');
+    assert.equal(builtinDetail.manageable, false);
+    assert.equal(builtinDetail.document, creator.content, 'readonly detail exposes registered instructions');
+    await assert.rejects(ctx.dshSkillsMaster.setEnabled('dsh-skills-master-skill-creator', false), /skill\/not-manageable/);
     assert.equal(creator.resourceBase.kind, 'directory');
     assert.match(await readFile(join(creator.resourceBase.path, 'references', 'dsh-authoring.md'), 'utf8'), /Harness/);
     const originalService = ctx.dshSkillsMaster;

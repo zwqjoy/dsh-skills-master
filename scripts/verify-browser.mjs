@@ -56,6 +56,17 @@ try {
   await page.getByRole('button',{name:'查看技能 local-sample',exact:true}).click();
   await page.getByText('LOCAL_FIXTURE_BODY',{exact:false}).waitFor();
   await page.getByRole('button',{name:'关闭',exact:true}).click();
+  const builtin=page.getByRole('button',{name:'查看技能 dsh-skills-master-skill-creator 的只读说明',exact:true});
+  await builtin.click();
+  const readonlyDialog=page.getByRole('dialog',{name:'dsh-skills-master-skill-creator 技能详情'});
+  await readonlyDialog.locator('.skill-document').filter({hasText:'Skill Creator'}).waitFor();
+  assert.equal(await readonlyDialog.getByRole('switch').count(),0);
+  assert.equal(await readonlyDialog.getByRole('button',{name:'编辑',exact:true}).count(),0);
+  await readonlyDialog.getByText('只读不代表已停用。',{exact:false}).waitFor();
+  await readonlyDialog.evaluate(async el=>{await Promise.all(el.getAnimations().map(animation=>animation.finished));});
+  await page.screenshot({path:'test-results/readonly-detail.png'});
+  await readonlyDialog.getByRole('button',{name:'关闭',exact:true}).click();
+  await page.getByRole('switch',{name:'停用技能 local-sample',exact:true}).waitFor();
   await page.getByRole('button',{name:'SkillHub',exact:true}).click();
   await page.getByRole('button',{name:'安装 市场测试技能',exact:true}).waitFor();
   await page.screenshot({path:'test-results/market-desktop.png',fullPage:true});

@@ -644,6 +644,7 @@ export class SkillManager extends Service implements SkillManagementService {
     const readonlyDetail: ManagedSkillDetail = {
       name: definition.name, description: definition.description, whenToUse: definition.whenToUse,
       modelInvocable: definition.invocation.modelInvocable, state: 'readonly', manageable: false, resources: [],
+      document: definition.content,
     };
     if (!definition.path) return readonlyDetail;
     const active = await this.managedEntryForPath(definition.path);

@@ -15,3 +15,7 @@ Reproduce with the commands in README. CI runs deterministic checks; live networ
 ## 0.1.1 dialog layout fix
 
 Confirmed market-install title/body padding, right-aligned fixed action area, long-description scrolling and file-list expansion at 390 x 640. Production Client/browser regression and archive activation checks pass. User Desktop screenshot supplied the defect evidence; post-update Desktop verification remains pending.
+
+## 0.1.2 readonly skills
+
+Readonly cards and details show an explicit builtin/readonly badge instead of a disabled switch. Clicking the badge opens the actual instructions returned by the official skill registry. Browser verification checks the builtin creator body, absence of switches/edit controls, and the continued availability of the local skill toggle. The Host regression also checks that readonly content is exposed while mutations remain rejected. All 18 tests and browser/package checks passed. Desktop App update verification remains pending.
