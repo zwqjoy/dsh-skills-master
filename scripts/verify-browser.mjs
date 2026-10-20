@@ -53,7 +53,31 @@ try {
   });
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   browser=await chromium.launch({headless:true, ...(existsSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome') ? {channel:'chrome'} : {})});const page=await browser.newPage({viewport:{width:1280,height:850}});const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  // Reproduce the installed archive manager's broad workspace-delete heuristic.
+  // The skill menu must remain accessible without being classified as a workspace menu.
+  await page.addInitScript(() => {
+    window.__archiveInjectionCount=0;
+    const scan=()=>{
+      for(const menu of document.querySelectorAll('[role="menu"]')) {
+        if(menu.querySelector('[data-test-archive-injected]')) continue;
+        const target=[...menu.querySelectorAll('button[role="menuitem"]')].find(button=>
+          /删除工作区|delete workspace/i.test(button.textContent||'') || /(?:^|[_\s-])danger(?:$|[_\s-])/i.test(button.className));
+        if(target) { const item=document.createElement('button');item.dataset.testArchiveInjected='true';item.textContent='归档全部会话';menu.prepend(item);window.__archiveInjectionCount++; }
+      }
+    };
+    new MutationObserver(scan).observe(document,{childList:true,subtree:true});
+  });
   await page.goto(`http://127.0.0.1:${server.address().port}`);
+  await page.getByRole('button',{name:'管理技能 local-sample',exact:true}).click();
+  const skillMenu=page.getByRole('menu');
+  for(const name of ['去试试','编辑','打开文件夹','卸载']) await skillMenu.getByRole('menuitem',{name,exact:true}).waitFor();
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.equal(await page.evaluate(()=>window.__archiveInjectionCount),0,'skill actions must not match workspace archive injection');
+  await page.screenshot({path:'test-results/skill-actions-menu.png'});
+  await skillMenu.getByRole('menuitem',{name:'编辑',exact:true}).click();
+  await page.getByText('LOCAL_FIXTURE_BODY',{exact:false}).waitFor();
+  await page.getByRole('button',{name:'关闭',exact:true}).click();
+
   await page.getByRole('button',{name:'查看技能 local-sample',exact:true}).click();
   await page.getByText('LOCAL_FIXTURE_BODY',{exact:false}).waitFor();
   await page.getByRole('button',{name:'关闭',exact:true}).click();
