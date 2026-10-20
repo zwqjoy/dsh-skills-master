@@ -200,6 +200,8 @@ ${controlsCss}
 
 /** Keep the search field usable when the desktop panel becomes narrow. */
 export const standaloneCss = `
+.dsm-skills .local-skill-group{margin-top:28px}.dsm-skills .local-skill-group+.local-skill-group{padding-top:24px;border-top:1px solid var(--dsw-alias-border-l2)}.dsm-skills .local-group-empty{padding:20px 0;margin:0}
+
 .dsm-skills .dsm-skill-menu .dsm-skill-uninstall{color:var(--dsw-alias-state-error-primary)}
 
 .dsm-skills .market-filters{display:flex;align-items:center;gap:16px;margin:20px 0;min-width:0}
