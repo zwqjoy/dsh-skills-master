@@ -175,7 +175,9 @@ export class SkillManager extends Service implements SkillManagementService {
     this.importRoot = options.importRoot === undefined ? undefined : resolve(options.importRoot);
     const dshHome = resolve(options.dshHome ?? process.env.DSH_HOME ?? join(homedir(), '.dsh'));
     const agentsHome = resolve(options.agentsHome ?? process.env.DSH_AGENTS_HOME ?? join(dshHome, 'agents'));
-    this.activeRoots = [join(agentsHome, 'skills'), join(dshHome, 'skills')];
+    // Default installs must use a private root scanned by the official Agent provider.
+    const sharedHome = options.agentsHome ?? process.env.DSH_AGENTS_HOME;
+    this.activeRoots = [join(sharedHome ? resolve(sharedHome) : dshHome, 'skills'), join(dshHome, 'skills')];
     this.disabledRoot = join(agentsHome, '.dsh-skills-master-disabled', 'skills');
     this.trashRoot = join(agentsHome, '.dsh-skills-master-trash', 'skills');
     this.stateRoot = join(agentsHome, '.dsh-skills-master-state', 'skills');

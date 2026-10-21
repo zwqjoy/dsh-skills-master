@@ -8393,7 +8393,8 @@ var SkillManager = class extends Service {
     this.importRoot = options.importRoot === void 0 ? void 0 : resolve3(options.importRoot);
     const dshHome = resolve3(options.dshHome ?? process.env.DSH_HOME ?? join3(homedir(), ".dsh"));
     const agentsHome = resolve3(options.agentsHome ?? process.env.DSH_AGENTS_HOME ?? join3(dshHome, "agents"));
-    this.activeRoots = [join3(agentsHome, "skills"), join3(dshHome, "skills")];
+    const sharedHome = options.agentsHome ?? process.env.DSH_AGENTS_HOME;
+    this.activeRoots = [join3(sharedHome ? resolve3(sharedHome) : dshHome, "skills"), join3(dshHome, "skills")];
     this.disabledRoot = join3(agentsHome, ".dsh-skills-master-disabled", "skills");
     this.trashRoot = join3(agentsHome, ".dsh-skills-master-trash", "skills");
     this.stateRoot = join3(agentsHome, ".dsh-skills-master-state", "skills");

@@ -14,7 +14,7 @@ import { SkillManager } from '../src/services/manager.js';
 const skillPackageRequire = createRequire(new URL('../package.json', import.meta.url));
 const { zipSync } = skillPackageRequire('fflate');
 
-test('default managed skills stay inside the Skills Master home', async () => {
+test('default installs stay private and are discovered by the default Agent provider', async () => {
   const root = await mkdtemp(join(tmpdir(), 'dsh-skills-master-skill-private-home-'));
   const dshHome = join(root, 'dsh');
   const agentsHome = join(dshHome, 'agents');
@@ -24,11 +24,16 @@ test('default managed skills stay inside the Skills Master home', async () => {
   try {
     process.env.DSH_HOME = dshHome;
     delete process.env.DSH_AGENTS_HOME;
-    await mkdir(join(agentsHome, 'skills', 'private-skill'), { recursive: true });
-    await writeFile(join(agentsHome, 'skills', 'private-skill', 'SKILL.md'), '---\nname: private-skill\ndescription: Private Skills Master skill\n---\n');
+    const source = join(root, 'incoming');
+    await mkdir(source, { recursive: true });
+    await writeFile(join(source, 'SKILL.md'), '---\nname: private-skill\ndescription: Private Skills Master skill\n---\nInstructions\n');
     await ctx.plugin(SkillRegistry);
-    await ctx.plugin(filesystem, { dshHome, agentsHome, watch: false });
     new SkillManager(ctx);
+    const receipt = await ctx.dshSkillsMaster.installImport({ source });
+    assert.equal(receipt.path, join(dshHome, 'skills', 'private-skill'));
+    await ctx.plugin(filesystem, { dshHome, watch: false });
+    assert.equal((await ctx.skills.list()).some(skill => skill.name === 'private-skill'), true);
+    assert.ok((await ctx.skills.get('private-skill'))?.content.includes('Instructions'));
     const skills = await ctx.dshSkillsMaster.list();
     assert.equal(skills.find(skill => skill.name === 'private-skill')?.manageable, true);
     assert.equal((await readdir(join(root))).includes('.agents'), false);
